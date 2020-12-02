@@ -3,6 +3,7 @@ import * as Registry from '../registry';
 export interface AttributorOptions {
   scope?: Registry.Scope;
   whitelist?: string[];
+  default?: string;
 }
 
 export default class Attributor {
@@ -10,6 +11,7 @@ export default class Attributor {
   keyName: string;
   scope: Registry.Scope;
   whitelist: string[] | undefined;
+  default: string|undefined;
 
   static keys(node: HTMLElement): string[] {
     return [].map.call(node.attributes, function(item: Attr) {
@@ -28,6 +30,7 @@ export default class Attributor {
       this.scope = Registry.Scope.ATTRIBUTE;
     }
     if (options.whitelist != null) this.whitelist = options.whitelist;
+    if (options.default != null) this.default = options.default;
   }
 
   add(node: HTMLElement, value: string): boolean {
@@ -48,7 +51,11 @@ export default class Attributor {
   }
 
   remove(node: HTMLElement): void {
-    node.removeAttribute(this.keyName);
+    if (this.default != null) {
+      node.setAttribute(this.keyName, this.default);
+    }else{
+      node.removeAttribute(this.keyName);
+    } 
   }
 
   value(node: HTMLElement): string {
@@ -56,6 +63,6 @@ export default class Attributor {
     if (this.canAdd(node, value) && value) {
       return value;
     }
-    return '';
+    return "";
   }
 }
