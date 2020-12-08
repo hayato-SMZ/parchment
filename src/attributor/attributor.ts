@@ -3,6 +3,7 @@ import Scope from '../scope';
 export interface AttributorOptions {
   scope?: Scope;
   whitelist?: string[];
+  default?: string;
 }
 
 export default class Attributor {
@@ -14,6 +15,7 @@ export default class Attributor {
   public keyName: string;
   public scope: Scope;
   public whitelist: string[] | undefined;
+  public default: string | undefined;
 
   constructor(
     attrName: string,
@@ -30,6 +32,9 @@ export default class Attributor {
         : Scope.ATTRIBUTE;
     if (options.whitelist != null) {
       this.whitelist = options.whitelist;
+    }
+    if (options.default != null) { 
+      this.default = options.default;
     }
   }
 
@@ -53,7 +58,11 @@ export default class Attributor {
   }
 
   public remove(node: HTMLElement): void {
-    node.removeAttribute(this.keyName);
+    if (this.default != null) { 
+      node.setAttribute(this.keyName, this.default);
+    } else {
+      node.removeAttribute(this.keyName);      
+    }
   }
 
   public value(node: HTMLElement): string {
@@ -61,6 +70,10 @@ export default class Attributor {
     if (this.canAdd(node, value) && value) {
       return value;
     }
-    return '';
+    if (this.default != null) {
+      return this.default
+    } else {
+      return '';      
+    }
   }
 }
